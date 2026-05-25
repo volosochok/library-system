@@ -706,6 +706,10 @@ with app.app_context():
         db.session.add_all(books)
         db.session.commit()
         
+        book1 = Book.query.filter_by(title='Кобзар').first()  # id=1
+        book3 = Book.query.filter_by(title='Тіні забутих предків').first()  # id=3
+        book6 = Book.query.filter_by(title='Лісова пісня').first()  # id=6
+
         # Читачі
         readers = [
             Reader(card_number='001', full_name='Олена Шевченко', phone='0981112233', email='olena@example.com', address='вул. Шевченка, 10', user_id=reader_user.id),
@@ -713,6 +717,51 @@ with app.app_context():
             Reader(card_number='003', full_name='Наталія Коваль', phone='0963334455', email='natalia@example.com', address='вул. Франка, 15', user_id=None),
         ]
         db.session.add_all(readers)
+        db.session.commit()
+
+        reader1 = Reader.query.filter_by(card_number='001').first()  # Олена Шевченко
+        reader2 = Reader.query.filter_by(card_number='002').first()  # Петро Мельник
+        reader3 = Reader.query.filter_by(card_number='003').first()  # Наталія Коваль
+
+        librarian_user = User.query.filter_by(role='librarian').first()
+
+        today = datetime.now().date()
+
+        loan_returned = Loan(
+            book_id=book1.id,
+            reader_id=reader1.id,
+            librarian_id=librarian_user.id,
+            loan_date=today - timedelta(days=30),
+            due_date=today - timedelta(days=16),
+            return_date=today - timedelta(days=15),
+            status='returned'
+        )
+        db.session.add(loan_returned)
+
+        loan_active = Loan(
+            book_id=book6.id,
+            reader_id=reader2.id,
+            librarian_id=librarian_user.id,
+            loan_date=today - timedelta(days=5),
+            due_date=today + timedelta(days=9),
+            status='active'
+        )
+        db.session.add(loan_active)
+        # Зменшуємо доступну кількість
+        book6.available_copies -= 1
+
+        loan_overdue = Loan(
+            book_id=book3.id,
+            reader_id=reader3.id,
+            librarian_id=librarian_user.id,
+            loan_date=today - timedelta(days=25),
+            due_date=today - timedelta(days=4),  # Прострочена на 4 дні
+            status='active'
+        )
+        db.session.add(loan_overdue)
+        # Зменшуємо доступну кількість (книга все ще у читача)
+        book3.available_copies -= 1
+
         db.session.commit()
         
         # Інформація про бібліотеку
