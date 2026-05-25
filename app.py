@@ -677,6 +677,57 @@ def extend_loan(loan_id):
     flash(f'Бронювання продовжено до {new_due_date.strftime("%d.%m.%Y")}!', 'success')
     return redirect(url_for('profile'))
 
+# Створення бази даних при запуску (для Railway)
+with app.app_context():
+    db.create_all()
+    
+    # Додаємо тестові дані, якщо їх немає
+    if User.query.count() == 0:
+        # Користувачі
+        admin = User(username='admin', password=generate_password_hash('admin123'), role='admin', full_name='Адміністратор')
+        librarian = User(username='librarian', password=generate_password_hash('lib123'), role='librarian', full_name='Марія Петрівна')
+        reader_user = User(username='reader', password=generate_password_hash('reader123'), role='reader', full_name='Іван Коваленко')
+        db.session.add_all([admin, librarian, reader_user])
+        db.session.commit()
+        
+        # Книги з жанрами
+        books = [
+            Book(title='Кобзар', author='Тарас Шевченко', year=1840, publisher='Дніпро', genre='Поезія', total_copies=5, available_copies=5),
+            Book(title='Кайдашева сім\'я', author='Іван Нечуй-Левицький', year=1878, publisher='Наукова думка', genre='Класика', total_copies=3, available_copies=3),
+            Book(title='Тіні забутих предків', author='Михайло Коцюбинський', year=1911, publisher='Либідь', genre='Класика', total_copies=2, available_copies=2),
+            Book(title='Зачарована Десна', author='Олександр Довженко', year=1956, publisher='Дніпро', genre='Проза', total_copies=4, available_copies=4),
+            Book(title='Собор', author='Олесь Гончар', year=1968, publisher='Український письменник', genre='Роман', total_copies=3, available_copies=3),
+            Book(title='Лісова пісня', author='Леся Українка', year=1911, publisher='Веселка', genre='Драма', total_copies=6, available_copies=6),
+            Book(title='Маруся', author='Григорій Квітка-Основ\'яненко', year=1834, publisher='Фоліо', genre='Класика', total_copies=2, available_copies=2),
+            Book(title='Тигролови', author='Іван Багряний', year=1944, publisher='Смолоскип', genre='Пригоди', total_copies=4, available_copies=4),
+            Book(title='Мина Мазайло', author='Микола Куліш', year=1929, publisher='Либідь', genre='Комедія', total_copies=2, available_copies=2),
+            Book(title='Сто сонць', author='Любко Дереш', year=2018, publisher='Клуб сімейного дозвілля', genre='Сучасна література', total_copies=3, available_copies=3),
+        ]
+        db.session.add_all(books)
+        db.session.commit()
+        
+        # Читачі
+        readers = [
+            Reader(card_number='001', full_name='Олена Шевченко', phone='0981112233', email='olena@example.com', address='вул. Шевченка, 10', user_id=reader_user.id),
+            Reader(card_number='002', full_name='Петро Мельник', phone='0972223344', email='petro@example.com', address='пр. Свободи, 5', user_id=None),
+            Reader(card_number='003', full_name='Наталія Коваль', phone='0963334455', email='natalia@example.com', address='вул. Франка, 15', user_id=None),
+        ]
+        db.session.add_all(readers)
+        db.session.commit()
+        
+        # Інформація про бібліотеку
+        if LibraryInfo.query.count() == 0:
+            info = LibraryInfo(
+                working_hours="Понеділок - П'ятниця: 9:00 - 20:00\nСубота: 10:00 - 18:00\nНеділя: Вихідний",
+                contacts="вул. Книжкова, 15, Львів\n+380 (32) 123-45-67\nlibrary@example.com",
+                history="Наша бібліотека заснована у 1950 році.",
+                address="м. Львів, вул. Книжкова, 15"
+            )
+            db.session.add(info)
+            db.session.commit()
+        
+        print("Базу даних створено з тестовими даними!")
+
 if __name__ == '__main__':
     app.run(debug=True)
 
