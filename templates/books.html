@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2><i class="fas fa-book"></i> Каталог книг</h2>
+<p class="text-muted">Пошук книг за назвою або автором</p>
+
+<!-- Простий пошуковий рядок (завжди видимий) -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-3" id="simpleSearchForm">
+            <div class="col-md-9">
+                <input type="text" class="form-control form-control-lg" name="search" 
+                       placeholder="Пошук за назвою або автором..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <i class="fas fa-search"></i> Шукати
+                </button>
+            </div>
+        </form>
+        
+        <!-- Кнопка для показу/приховування розширеного пошуку -->
+        <div class="text-center mt-2">
+            <button class="btn btn-link btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSearch">
+                <i class="fas fa-chevron-down" id="toggleIcon"></i>
+                <span id="toggleText">Показати розширений пошук</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Розширений пошук (прихований за замовчуванням) -->
+<div class="collapse" id="advancedSearch">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-filter"></i> Розширені фільтри</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <!-- Приховуємо пошуковий рядок у формі, але передаємо його значення -->
+                <input type="hidden" name="search" value="{{ search }}">
+                
+                <div class="col-md-4">
+                    <label class="form-label">Автор</label>
+                    <select class="form-select" name="author">
+                        <option value="">Всі автори</option>
+                        {% for a in authors %}
+                        <option value="{{ a }}" {% if author == a %}selected{% endif %}>{{ a }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label">Жанр</label>
+                    <select class="form-select" name="genre">
+                        <option value="">Всі жанри</option>
+                        {% for g in genres %}
+                        <option value="{{ g }}" {% if genre == g %}selected{% endif %}>{{ g }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <label class="form-label">Рік від</label>
+                    <input type="number" class="form-control" name="year_from" placeholder="1800" value="{{ year_from }}">
+                </div>
+                
+                <div class="col-md-2">
+                    <label class="form-label">Рік до</label>
+                    <input type="number" class="form-control" name="year_to" placeholder="2026" value="{{ year_to }}">
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label">Наявність</label>
+                    <select class="form-select" name="available">
+                        <option value="">Всі книги</option>
+                        <option value="yes" {% if available == 'yes' %}selected{% endif %}>Тільки в наявності</option>
+                        <option value="no" {% if available == 'no' %}selected{% endif %}>Немає в наявності</option>
+                    </select>
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Застосувати фільтри
+                    </button>
+                    <a href="{{ url_for('books') }}" class="btn btn-secondary">
+                        <i class="fas fa-undo"></i> Скинути всі
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Сортування результатів -->
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <div>
+        <strong>Знайдено книг: {{ books|length }}</strong>
+        {% if search or author or genre or year_from or year_to or available %}
+        <span class="badge bg-info ms-2">Фільтри активні</span>
+        {% endif %}
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fas fa-sort"></i> Сортувати за: 
+            {% if sort_by == 'title' %}Назвою
+            {% elif sort_by == 'author' %}Автором
+            {% elif sort_by == 'genre' %}Жанром
+            {% elif sort_by == 'year' %}Роком
+            {% elif sort_by == 'available' %}Наявністю
+            {% else %}Назвою{% endif %}
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='title', order='asc') }}">Назва (А-Я)</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='title', order='desc') }}">Назва (Я-А)</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='author', order='asc') }}">Автор (А-Я)</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='author', order='desc') }}">Автор (Я-А)</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='genre', order='asc') }}">Жанр (А-Я)</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='genre', order='desc') }}">Жанр (Я-А)</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='year', order='asc') }}">Рік (старіші)</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='year', order='desc') }}">Рік (новіші)</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='available', order='asc') }}">Наявність (спочатку немає)</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('books', search=search, author=author, genre=genre, year_from=year_from, year_to=year_to, available=available, sort_by='available', order='desc') }}">Наявність (спочатку є)</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Результати -->
+<div class="row">
+    {% for book in books %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ book.title }}</h5>
+                <div class="mb-2">
+                    <span class="badge bg-secondary">{{ book.genre or 'Без жанру' }}</span>
+                </div>
+                <p class="card-text text-muted">{{ book.author }}</p>
+                <p class="small">
+                    <strong>Рік:</strong> {{ book.year }}<br>
+                    <strong>Видавництво:</strong> {{ book.publisher }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <span class="badge {% if book.available_copies > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                        {% if book.available_copies > 0 %}
+                            Є в наявності ({{ book.available_copies }}/{{ book.total_copies }})
+                        {% else %}
+                            Немає в наявності
+                        {% endif %}
+                    </span>
+                    <div>
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('add_to_wishlist', book_id=book.id) }}" 
+                            class="btn btn-sm btn-outline-primary" title="Додати до закладок">
+                                <i class="far fa-bookmark"></i>
+                            </a>
+                            <a href="{{ url_for('add_to_cart', book_id=book.id) }}" 
+                            class="btn btn-sm btn-outline-success" title="Додати до кошика">
+                                <i class="fas fa-cart-plus"></i>
+                            </a>
+                            <a href="{{ url_for('add_to_tracking', book_id=book.id) }}" 
+                            class="btn btn-sm btn-outline-secondary" title="Стежити за наявністю">
+                                <i class="fas fa-clock"></i>
+                            </a>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.role in ['admin', 'librarian'] %}
+                            <a href="{{ url_for('edit_book', id=book.id) }}" class="btn btn-sm btn-warning" title="Редагувати">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                            <a href="{{ url_for('delete_book', id=book.id) }}" class="btn btn-sm btn-danger" 
+                            onclick="return confirm('Ви впевнені?')" title="Видалити">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">Книг не знайдено за заданими критеріями</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not current_user.is_authenticated %}
+<div class="alert alert-info mt-3">
+    <i class="fas fa-info-circle"></i> 
+    <a href="{{ url_for('login') }}">Увійдіть</a> в систему, щоб отримати можливість додавати книги до закладок та кошика.
+</div>
+{% endif %}
+
+<script>
+    // Анімація іконки при відкритті/закритті розширеного пошуку
+    document.getElementById('advancedSearch').addEventListener('show.bs.collapse', function () {
+        document.getElementById('toggleIcon').className = 'fas fa-chevron-up';
+        document.getElementById('toggleText').innerText = 'Сховати розширений пошук';
+    });
+    document.getElementById('advancedSearch').addEventListener('hide.bs.collapse', function () {
+        document.getElementById('toggleIcon').className = 'fas fa-chevron-down';
+        document.getElementById('toggleText').innerText = 'Показати розширений пошук';
+    });
+    
+    // Якщо є активні фільтри - автоматично відкриваємо розширений пошук
+    {% if author or genre or year_from or year_to or available %}
+    document.addEventListener('DOMContentLoaded', function() {
+        var advancedSearch = document.getElementById('advancedSearch');
+        var bsCollapse = new bootstrap.Collapse(advancedSearch, { toggle: true });
+    });
+    {% endif %}
+</script>
+{% endblock %}

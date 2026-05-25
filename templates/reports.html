@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2><i class="fas fa-chart-bar"></i> Звіти</h2>
+
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Боржники (прострочені книги)</h5>
+            </div>
+            <div class="card-body">
+                {% if overdue_loans %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Книга</th>
+                                <th>Читач</th>
+                                <th>Телефон читача</th>
+                                <th>Дата видачі</th>
+                                <th>Мало бути повернено</th>
+                                <th>Прострочено (днів)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in overdue_loans %}
+                            <tr>
+                                <td>{{ loan.book.title }}</td>
+                                <td>{{ loan.reader.full_name }}</td>
+                                <td>{{ loan.reader.phone or 'Немає' }}</td>
+                                <td>{{ loan.loan_date }}</td>
+                                <td>{{ loan.due_date }}</td>
+                                <td>{{ (now.date() - loan.due_date).days }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="alert alert-info">Немає боржників! Всі книги повернуті вчасно.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-star"></i> Найпопулярніші книги</h5>
+            </div>
+            <div class="card-body">
+                {% if popular_books %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Назва книги</th>
+                                <th>Кількість видач</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in popular_books %}
+                            <tr>
+                                <td>{{ book.title }}</td>
+                                <td>{{ book.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Немає даних про видачі книг</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-{% if reader %}edit{% else %}plus{% endif %}"></i> {{ title }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="card_number" class="form-label">Номер читацького квитка *</label>
+                        <input type="text" class="form-control" id="card_number" name="card_number" 
+                               value="{{ reader.card_number if reader else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">ПІБ *</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" 
+                               value="{{ reader.full_name if reader else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Телефон</label>
+                        <input type="text" class="form-control" id="phone" name="phone" 
+                               value="{{ reader.phone if reader else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="{{ reader.email if reader else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Адреса</label>
+                        <textarea class="form-control" id="address" name="address" rows="2">{{ reader.address if reader else '' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зберегти</button>
+                    <a href="{{ url_for('readers') }}" class="btn btn-secondary">Скасувати</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

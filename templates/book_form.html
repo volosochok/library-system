@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-{% if book %}edit{% else %}plus{% endif %}"></i> {{ title }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Назва *</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ book.title if book else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="author" class="form-label">Автор *</label>
+                        <input type="text" class="form-control" id="author" name="author" value="{{ book.author if book else '' }}" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="year" class="form-label">Рік видання</label>
+                            <input type="number" class="form-control" id="year" name="year" value="{{ book.year if book else '' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="publisher" class="form-label">Видавництво</label>
+                            <input type="text" class="form-control" id="publisher" name="publisher" value="{{ book.publisher if book else '' }}">
+                        </div>
+                    </div>
+                        <div class="mb-3">
+                        <label for="genre" class="form-label">Жанр</label>
+                        <select class="form-select" id="genre" name="genre">
+                            <option value="">Оберіть жанр</option>
+                            <option value="Поезія" {% if book and book.genre == 'Поезія' %}selected{% endif %}>Поезія</option>
+                            <option value="Проза" {% if book and book.genre == 'Проза' %}selected{% endif %}>Проза</option>
+                            <option value="Класика" {% if book and book.genre == 'Класика' %}selected{% endif %}>Класика</option>
+                            <option value="Сучасна література" {% if book and book.genre == 'Сучасна література' %}selected{% endif %}>Сучасна література</option>
+                            <option value="Драма" {% if book and book.genre == 'Драма' %}selected{% endif %}>Драма</option>
+                            <option value="Фантастика" {% if book and book.genre == 'Фантастика' %}selected{% endif %}>Фантастика</option>
+                            <option value="Дитяча література" {% if book and book.genre == 'Дитяча література' %}selected{% endif %}>Дитяча література</option>
+                            <option value="Роман" {% if book and book.genre == 'Роман' %}selected{% endif %}>Роман</option>
+                            <option value="Детектив" {% if book and book.genre == 'Детектив' %}selected{% endif %}>Детектив</option>
+                            <option value="Наукова література" {% if book and book.genre == 'Наукова література' %}selected{% endif %}>Наукова література</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="total_copies" class="form-label">Кількість примірників *</label>
+                        <input type="number" class="form-control" id="total_copies" name="total_copies" value="{{ book.total_copies if book else 1 }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зберегти</button>
+                    <a href="{{ url_for('books') }}" class="btn btn-secondary">Скасувати</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

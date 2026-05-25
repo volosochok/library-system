@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Головний банер -->
+<div class="bg-primary text-white text-center py-5 mb-4" style="background: linear-gradient(135deg, #177245 0%, #004225 100%);">
+    <div class="container">
+        <h1 class="display-4">Ласкаво просимо до бібліотеки</h1>
+        <p class="lead">Сучасний простір для знань та натхнення</p>
+        <a href="{{ url_for('books') }}" class="btn btn-light btn-lg mt-3">
+            <i class="fas fa-book-open"></i> Перейти до каталогу книг
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Ліва колонка: Новини та події -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-newspaper"></i> Новини та події</h4>
+                </div>
+                <div class="card-body">
+                    {% if news %}
+                        {% for item in news %}
+                        <div class="mb-3 pb-3 border-bottom">
+                            <h5>{{ item.title }}</h5>
+                            <p class="text-muted small">{{ item.created_at.strftime('%d.%m.%Y') }}</p>
+                            <p>{{ item.content[:200] }}{% if item.content|length > 200 %}...{% endif %}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="mb-3 pb-3 border-bottom">
+                            <h5>Відкриття оновленої бібліотеки!</h5>
+                            <p class="text-muted small">15.05.2026</p>
+                            <p>Запрошуємо всіх відвідати нашу оновлену бібліотеку з сучасним дизайном та новими книгами.</p>
+                        </div>
+                        <div class="mb-3 pb-3 border-bottom">
+                            <h5>Літературний вечір</h5>
+                            <p class="text-muted small">20.05.2026</p>
+                            <p>Запрошуємо на зустріч з місцевими письменниками. Вхід вільний!</p>
+                        </div>
+                        <div class="mb-3 pb-3">
+                            <h5>Акція "Приведи друга"</h5>
+                            <p class="text-muted small">01.06.2026</p>
+                            <p>Приводь друга до бібліотеки та отримайте додатковий тиждень користування!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="fas fa-history"></i> Історія бібліотеки</h4>
+                </div>
+                <div class="card-body">
+                    {% if info and info.history %}
+                        <p>{{ info.history }}</p>
+                    {% else %}
+                        <p>Наша бібліотека заснована у 1950 році. За цей час ми стали центром знань та культури для багатьох поколінь. Сьогодні бібліотека має понад 50 000 книг, сучасний читальний зал та доступ до електронних ресурсів.</p>
+                        <img src="https://via.placeholder.com/800x300?text=Фото+бібліотеки" class="img-fluid rounded mt-3" alt="Бібліотека">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Права колонка -->
+        <div class="col-md-4">
+            <!-- Новинки книг -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-star"></i> Новинки книг</h5>
+                </div>
+                <div class="card-body">
+                    {% if new_books %}
+                        {% for book in new_books %}
+                        <div class="mb-2">
+                            <strong>{{ book.title }}</strong><br>
+                            <small class="text-muted">{{ book.author }}</small>
+                            {% if current_user.is_authenticated %}
+                            <button class="btn btn-sm btn-outline-primary mt-1" onclick="alert('У розробці: додати до закладок')">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% if not loop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>Новинки незабаром...</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Години роботи -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5><i class="fas fa-clock"></i> Години роботи</h5>
+                </div>
+                <div class="card-body">
+                    {% if info and info.working_hours %}
+                        <p>{{ info.working_hours }}</p>
+                    {% else %}
+                        <p>Понеділок - П'ятниця: 9:00 - 20:00<br>
+                        Субота: 10:00 - 18:00<br>
+                        Неділя: Вихідний</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Контакти -->
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5><i class="fas fa-address-card"></i> Контакти</h5>
+                </div>
+                <div class="card-body">
+                    {% if info and info.contacts %}
+                        <p>{{ info.contacts }}</p>
+                    {% else %}
+                        <p><i class="fas fa-map-marker-alt"></i> вул. Книжкова, 15, Львів<br>
+                        <i class="fas fa-phone"></i> +380 (32) 123-45-67<br>
+                        <i class="fas fa-envelope"></i> library@example.com</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бібліотечна система</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Основні кольори бібліотеки */
+            --library-primary: #8B5B29;
+            --library-primary-light: #A67C4D;
+            --library-success: #004225;
+            --library-danger: #800020;
+            --library-warning: #E09540;
+            --library-info: #177245;
+            --library-secondary: #A0785A;
+            --library-dark: #4d3820;
+            --library-light: #f4f3f2;
+        }
+        
+        /* Перевизначення Bootstrap кольорів */
+        .form-control:focus, .form-select:focus, textarea:focus, input:focus, .btn:focus, .btn:active { box-shadow: none !important; outline: none !important;}
+
+        .form-control:focus, .form-select:focus, textarea:focus, input:focus {border: 2px solid var(--library-primary) !important; transition: all 0.2s ease;}
+
+        .btn-link {color: var(--library-primary) !important; text-decoration: none !important;}
+        .btn-link:hover {color: var(--library-info) !important; text-decoration: underline !important;}
+        
+        .bg-primary { background-color: var(--library-primary) !important; }
+        .btn-primary { background-color: var(--library-primary) !important; border-color: var(--library-primary) !important; }
+        .btn-primary:hover { background-color: var(--library-primary-light) !important; border-color: var(--library-primary-light) !important; }
+        .text-primary { color: var(--library-primary) !important; }
+        .btn-outline-primary { color: var(--library-primary) !important; border-color: var(--library-primary) !important; }
+        .btn-outline-primary:hover { background-color: var(--library-primary) !important; border-color: var(--library-primary) !important; color: white !important; }
+    
+        .bg-success { background-color: var(--library-success) !important; }
+        .btn-success { background-color: var(--library-success) !important; border-color: var(--library-success) !important; }
+        .btn-outline-success { color: var(--library-success) !important; border-color: var(--library-success) !important; }
+        .btn-outline-success:hover { background-color: var(--library-success) !important; border-color: var(--library-success) !important; }
+    
+        .bg-danger { background-color: var(--library-danger) !important; }
+        .btn-danger { background-color: var(--library-danger) !important; border-color: var(--library-danger) !important; }
+        .btn-outline-danger { color: var(--library-danger) !important; border-color: var(--library-danger) !important; }
+        .btn-outline-danger:hover { background-color: var(--library-danger) !important; border-color: var(--library-danger) !important; }
+    
+        .bg-warning { background-color: var(--library-warning) !important; }
+        .btn-warning { background-color: var(--library-warning) !important; border-color: var(--library-warning) !important; color: white !important; }
+        .btn-outline-warning { color: var(--library-warning) !important; border-color: var(--library-warning) !important; }
+        .btn-outline-warning:hover { background-color: var(--library-warning) !important; border-color: var(--library-warning) !important; }
+    
+        .bg-info { background-color: var(--library-info) !important; }
+        .btn-info { background-color: var(--library-info) !important; border-color: var(--library-info) !important; }
+        .btn-outline-info { color: var(--library-info) !important; border-color: var(--library-info) !important; }
+        .btn-outline-info:hover { background-color: var(--library-info) !important; border-color: var(--library-info) !important; }
+    
+        .bg-secondary { background-color: var(--library-secondary) !important; }
+        .btn-secondary { background-color: var(--library-secondary) !important; border-color: var(--library-secondary) !important; }
+        .btn-outline-secondary { color: var(--library-secondary) !important; border-color: var(--library-secondary) !important; }
+        .btn-outline-secondary:hover { background-color: var(--library-secondary) !important; border-color: var(--library-secondary) !important; }
+    
+        .bg-dark { background-color: var(--library-dark) !important; }
+        .navbar-dark { background-color: var(--library-dark) !important; }
+        
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background-color: #A67C4D;
+        }
+        .sidebar a {
+            color: #f4f3f2;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .sidebar a:hover {
+            background-color: #8b5c298a;
+        }
+        .sidebar a.active {
+            background-color: #8B5B29;
+        }
+        .content {
+            padding: 20px;
+        }
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+        .card-stats {
+            transition: transform 0.2s;
+        }
+        .card-stats:hover {
+            transform: translateY(-5px);
+        }
+        .badge-notification {
+            position: relative;
+            top: -8px;
+            left: -5px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-book"></i> Бібліотечна система
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home"></i> Головна
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('books') }}">
+                            <i class="fas fa-book"></i> Каталог книг
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{{ url_for('profile') }}">
+                                <i class="fas fa-shopping-cart fa-lg"></i>
+                                {% if cart_count() > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
+                                    {{ cart_count() }}
+                                </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{{ url_for('profile') }}">
+                                <i class="fas fa-bookmark fa-lg"></i>
+                                {% if wishlist_count() > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
+                                    {{ wishlist_count() }}
+                                </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{{ url_for('profile') }}">
+                                <i class="fas fa-clock fa-lg"></i>
+                                {% if tracking_count() > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
+                                    {{ tracking_count() }}
+                                </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle fa-lg"></i> {{ current_user.full_name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}">
+                                    <i class="fas fa-id-card"></i> Особистий кабінет
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                                    <i class="fas fa-sign-out-alt"></i> Вийти
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <i class="fas fa-sign-in-alt"></i> Вхід
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            {% if current_user.is_authenticated %}
+                {% if current_user.role in ['admin', 'librarian'] %}
+                    <nav class="col-md-2 d-md-block sidebar">
+                        <div class="position-sticky pt-3">
+                            <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                                <i class="fas fa-tachometer-alt"></i> Головна
+                            </a>
+                            <a href="{{ url_for('books') }}" class="{% if request.endpoint == 'books' %}active{% endif %}">
+                                <i class="fas fa-book"></i> Книги
+                            </a>
+                            <a href="{{ url_for('readers') }}" class="{% if request.endpoint == 'readers' %}active{% endif %}">
+                                <i class="fas fa-users"></i> Читачі
+                            </a>
+                            <a href="{{ url_for('loans') }}" class="{% if request.endpoint == 'loans' %}active{% endif %}">
+                                <i class="fas fa-exchange-alt"></i> Видача/Повернення
+                            </a>
+                            <a href="{{ url_for('reports') }}" class="{% if request.endpoint == 'reports' %}active{% endif %}">
+                                <i class="fas fa-chart-bar"></i> Звіти
+                            </a>
+                            <hr class="bg-secondary">
+                            <a href="{{ url_for('add_book') }}">
+                                <i class="fas fa-plus"></i> Додати книгу
+                            </a>
+                            <a href="{{ url_for('add_reader') }}">
+                                <i class="fas fa-user-plus"></i> Додати читача
+                            </a>
+                            <a href="{{ url_for('create_loan') }}">
+                                <i class="fas fa-hand-holding"></i> Видати книгу
+                            </a>
+                        </div>
+                    </nav>
+                    <main class="col-md-10 ms-sm-auto px-md-4 content">
+                    {% else %}
+                    <main class="col-12 content">
+                    {% endif %}
+            {% else %}
+                <main class="col-12 content">
+            {% endif %}
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

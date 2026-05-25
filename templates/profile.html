@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-user-circle"></i> {{ current_user.full_name }}</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Логін:</strong> {{ current_user.username }}</p>
+                <p><strong>Роль:</strong> 
+                    {% if current_user.role == 'admin' %}Адміністратор
+                    {% elif current_user.role == 'librarian' %}Бібліотекар
+                    {% else %}Читач{% endif %}
+                </p>
+                <p><strong>Email:</strong> {{ current_user.email or 'Не вказано' }}</p>
+            </div>
+        </div>
+        
+        {% if has_debt %}
+        <div class="alert alert-danger mt-3">
+            <i class="fas fa-exclamation-triangle"></i> У вас є борги! Будь ласка, поверніть книги вчасно.
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-9">
+        <!-- Активні бронювання -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">
+                <h5><i class="fas fa-clock"></i> Мої активні бронювання</h5>
+            </div>
+            <div class="card-body">
+                {% if user_loans %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Книга</th>
+                                <th>Автор</th>
+                                <th>Дата видачі</th>
+                                <th>Повернути до</th>
+                                <th>Залишилось днів</th>
+                                <th>Дія</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in user_loans %}
+                            <tr {% if loan.due_date < now.date() %}class="table-danger"{% endif %}>
+                                <td>{{ loan.book.title }}</td>
+                                <td>{{ loan.book.author }}</td>
+                                <td>{{ loan.loan_date }}</td>
+                                <td>{{ loan.due_date }}</td>
+                                <td>
+                                    {% set days_left = (loan.due_date - now.date()).days %}
+                                    {% if days_left < 0 %}
+                                        <span class="badge bg-danger">Прострочено на {{ -days_left }} дн.</span>
+                                    {% else %}
+                                        <span class="badge bg-success">{{ days_left }} дн.</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if loan.due_date > now.date() %}
+                                    <a href="{{ url_for('extend_loan', loan_id=loan.id) }}" 
+                                       class="btn btn-sm btn-info"
+                                       onclick="return confirm('Продовжити бронювання на 14 днів?')">
+                                        <i class="fas fa-calendar-plus"></i> Продовжити
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">У вас немає активних бронювань</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Кошик -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-shopping-cart"></i> Кошик для бронювання</h5>
+            </div>
+            <div class="card-body">
+                {% if cart %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Книга</th>
+                                <th>Автор</th>
+                                <th>Наявність</th>
+                                <th>Дія</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart %}
+                            <tr>
+                                <td>{{ item.book.title }}</td>
+                                <td>{{ item.book.author }}</td>
+                                <td>
+                                    {% if item.book.available_copies > 0 %}
+                                    <span class="badge bg-success">Є в наявності</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Немає</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('remove_from_cart', book_id=item.book.id) }}" 
+                                       class="btn btn-sm btn-danger">Видалити</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end">
+                    <a href="{{ url_for('checkout_cart') }}" class="btn btn-primary"
+                       onclick="return confirm('Забронювати всі книги з кошика?')">
+                        <i class="fas fa-check"></i> Забронювати всі
+                    </a>
+                </div>
+                {% else %}
+                <p class="text-muted">Кошик порожній</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Закладки -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="fas fa-bookmark"></i> Закладки</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if wishlist %}
+                        <ul class="list-group">
+                            {% for item in wishlist %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ item.book.title }} - {{ item.book.author }}
+                                <a href="{{ url_for('remove_from_wishlist', book_id=item.book.id) }}" 
+                                   class="btn btn-sm btn-outline-danger">Видалити</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">Закладок немає</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Відстеження -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5><i class="fas fa-clock"></i> Відстеження книг</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if tracking %}
+                        <ul class="list-group">
+                            {% for item in tracking %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ item.book.title }} - {{ item.book.author }}
+                                <a href="{{ url_for('remove_from_tracking', book_id=item.book.id) }}" 
+                                   class="btn btn-sm btn-outline-danger">Скасувати</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">Ви не відстежуєте жодну книгу</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Історія бронювань -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5><i class="fas fa-history"></i> Історія бронювань</h5>
+            </div>
+            <div class="card-body">
+                {% if loan_history %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Книга</th>
+                                <th>Дата видачі</th>
+                                <th>Дата повернення</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in loan_history %}
+                            <tr>
+                                <td>{{ loan.book.title }}</td>
+                                <td>{{ loan.loan_date }}</td>
+                                <td>{{ loan.return_date or 'Не повернуто' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Історія бронювань порожня</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-hand-holding"></i> Видача книги</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="book_id" class="form-label">Книга *</label>
+                        <select class="form-control" id="book_id" name="book_id" required>
+                            <option value="">Оберіть книгу</option>
+                            {% for book in books %}
+                            <option value="{{ book.id }}">
+                                {{ book.title }} - {{ book.author }} (в наявності: {{ book.available_copies }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reader_id" class="form-label">Читач *</label>
+                        <select class="form-control" id="reader_id" name="reader_id" required>
+                            <option value="">Оберіть читача</option>
+                            {% for reader in readers %}
+                            <option value="{{ reader.id }}">
+                                {{ reader.full_name }} (№ картки: {{ reader.card_number }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="days" class="form-label">Термін (днів)</label>
+                        <input type="number" class="form-control" id="days" name="days" value="14" min="1" max="60">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Видати книгу</button>
+                    <a href="{{ url_for('loans') }}" class="btn btn-secondary">Скасувати</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

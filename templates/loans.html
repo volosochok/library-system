@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2><i class="fas fa-exchange-alt"></i> Управління видачею книг</h2>
+
+{% if current_user.role in ['admin', 'librarian'] %}
+<div class="mb-4">
+    <a href="{{ url_for('create_loan') }}" class="btn btn-primary">
+        <i class="fas fa-hand-holding"></i> Видати книгу
+    </a>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5><i class="fas fa-clock"></i> Активні видачі</h5>
+            </div>
+            <div class="card-body">
+                {% if active_loans %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Книга</th>
+                                <th>Читач</th>
+                                <th>Дата видачі</th>
+                                <th>Повернути до</th>
+                                <th>Статус</th>
+                                <th>Дія</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in active_loans %}
+                            <tr {% if loan.due_date < now.date() %}class="table-danger"{% endif %}>
+                                <td>{{ loan.book.title }}</td>
+                                <td>{{ loan.reader.full_name }}</td>
+                                <td>{{ loan.loan_date }}</td>
+                                <td>{{ loan.due_date }}</td>
+                                <td>
+                                    {% if loan.due_date < now.date() %}
+                                    <span class="badge bg-danger">Прострочено</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Активно</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if current_user.role in ['admin', 'librarian'] %}
+                                    <a href="{{ url_for('return_loan', id=loan.id) }}" class="btn btn-sm btn-success"
+                                       onclick="return confirm('Підтвердити повернення?')">
+                                        <i class="fas fa-undo"></i> Повернути
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Немає активних видач</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5><i class="fas fa-history"></i> Історія видач</h5>
+            </div>
+            <div class="card-body">
+                {% if history %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Книга</th>
+                                <th>Читач</th>
+                                <th>Дата видачі</th>
+                                <th>Дата повернення</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in history %}
+                            <tr>
+                                <td>{{ loan.book.title }}</td>
+                                <td>{{ loan.reader.full_name }}</td>
+                                <td>{{ loan.loan_date }}</td>
+                                <td>{{ loan.return_date }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Історія видач порожня</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
